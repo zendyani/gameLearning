@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Learning js game programming</title>
+</head>
+<body>
+	<canvas id="gameCanvas" width="800" height="600"></canvas>
+	<script type="text/javascript">
+		
+		var canvas, cx;
+		var ballX = 0;
+		var ballSpeedX = 5;
+
+		window.onload = function() {
+			canvas = document.getElementById("gameCanvas");
+			cx = canvas.getContext("2d");
+
+			var framePerSecond = 30;
+			setInterval(updateAll, 1000/framePerSecond);
+		}
+
+		function updateAll() {
+			ballX += ballSpeedX ;
+
+			// bouncing back
+			if (ballX > canvas.width || ballX < 0) {
+				ballSpeedX *= -1;
+			}
+
+			// create rectangle that will cover all our canvas
+			cx.fillStyle = "black";
+			cx.fillRect(0, 0, canvas.width, canvas.height);
+
+			// create a ball above aur rectangle
+			// color the next drawing
+			cx.fillStyle = "white";
+
+			// draw the arc with radius pi*2 that is a circle
+			cx.beginPath();
+			cx.arc(ballX, 100, 10, 0, Math.PI*2, true);
+			cx.fill();
+
+		}
+
+	</script>
+</body>
+</html>
