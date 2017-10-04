@@ -5,12 +5,29 @@
 	<title>Learning js game programming</title>
 </head>
 <body>
-	<canvas id="gameCanvas" width="800" height="600"></canvas>
+	<canvas id="gameCanvas" width="800" height="500"></canvas>
 	<script type="text/javascript">
 		
 		var canvas, cx;
 		var ballX = 0;
 		var ballSpeedX = 5;
+		var ballY = 0;
+		var ballSpeedY = 7;
+
+		const PADDLE_WIDTH = 100;
+		const PADDLE_THICKNESS = 10;
+		const PADDLE_DIST_FROM_EDGE = 40;
+		var paddleX = 400;
+
+		function updateMousePos(evt) {
+			var rect = canvas.getBoundingClientRect();
+			var root = document.documentElement;
+
+			var mouseX = evt.clientX - rect.left - root.scrollLeft;
+			// var mouseY = evt.clientY - rect.top - root.scrollTop;
+			
+			paddleX = mouseX - PADDLE_WIDTH/2;
+		}
 
 		window.onload = function() {
 			canvas = document.getElementById("gameCanvas");
@@ -18,29 +35,70 @@
 
 			var framePerSecond = 30;
 			setInterval(updateAll, 1000/framePerSecond);
+
+			canvas.addEventListener('mousemove', updateMousePos);
 		}
 
 		function updateAll() {
+			moveAll();
+			drawAll();
+		}
+
+		function ballReset() {
+			ballX = canvas.width/2
+			ballY = 0;
+		}
+
+		function moveAll() {
 			ballX += ballSpeedX ;
+			ballY += ballSpeedY ;
 
 			// bouncing back
 			if (ballX > canvas.width || ballX < 0) {
 				ballSpeedX *= -1;
 			}
+			
+			if (ballY > canvas.height || ballY < 0) {
+				ballSpeedY *= -1;
+			}
 
+			if (ballY > canvas.height) {
+				ballReset();
+			}
+
+			var paddleTopEdgeY = canvas.height - PADDLE_DIST_FROM_EDGE;
+			var paddleBottomEdgeY = paddleTopEdgeY + PADDLE_THICKNESS;
+			var paddleLeftEdgeX = paddleX;
+			var paddleRightEdgeX = paddleX + PADDLE_WIDTH;
+
+			if (ballY > paddleTopEdgeY && ballY < paddleBottomEdgeY && ballX > paddleLeftEdgeX && ballX < paddleRightEdgeX) {
+				ballSpeedY *= -1
+			}
+
+		}
+		
+		function drawAll() {
 			// create rectangle that will cover all our canvas
-			cx.fillStyle = "black";
-			cx.fillRect(0, 0, canvas.width, canvas.height);
+			colorRect(0,0, canvas.width,canvas.height, "black");
+			colorCircle(ballX, ballY, 10, "white");
 
-			// create a ball above aur rectangle
+			// draw paddle
+			var paddleY = canvas.height-PADDLE_THICKNESS-PADDLE_DIST_FROM_EDGE;
+			colorRect(paddleX,paddleY, PADDLE_WIDTH,PADDLE_THICKNESS, "white");
+		}
+
+		function colorRect(topLeftX,topLeftY, boxWidth,boxHeight, fillColor) {
+			cx.fillStyle = fillColor;
+			cx.fillRect(topLeftX,topLeftY, boxWidth,boxHeight);			
+		}
+
+		function colorCircle(centerX,centerY, radius, fillColor) {
 			// color the next drawing
-			cx.fillStyle = "white";
-
+			cx.fillStyle = fillColor;
 			// draw the arc with radius pi*2 that is a circle
 			cx.beginPath();
-			cx.arc(ballX, 100, 10, 0, Math.PI*2, true);
+			cx.arc(centerX,centerY, radius, 0, Math.PI*2, true);
 			cx.fill();
-
 		}
 
 	</script>
